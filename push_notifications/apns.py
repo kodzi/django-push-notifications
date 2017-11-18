@@ -61,7 +61,7 @@ def _apns_prepare(
 
 
 def _apns_send(
-	registration_id, alert, batch=False, application_id=None, certfile=None, **kwargs
+	registration_id, alert, topic=None, batch=False, application_id=None, certfile=None, **kwargs
 ):
 	client = _apns_create_socket(certfile=certfile, application_id=application_id)
 
@@ -79,18 +79,20 @@ def _apns_send(
 		except ValueError:
 			raise APNSUnsupportedPriority("Unsupported priority %d" % (priority))
 
+	topic = topic if topic is not None else get_manager().get_apns_topic(application_id=application_id)
+
 	if batch:
 		data = [apns2_client.Notification(
 			token=rid, payload=_apns_prepare(rid, alert, **kwargs)) for rid in registration_id]
 		return client.send_notification_batch(
-			data, get_manager().get_apns_topic(application_id=application_id),
+			data, topic,
 			**notification_kwargs
 		)
 
 	data = _apns_prepare(registration_id, alert, **kwargs)
 	client.send_notification(
 		registration_id, data,
-		get_manager().get_apns_topic(application_id=application_id),
+		topic,
 		**notification_kwargs
 	)
 
