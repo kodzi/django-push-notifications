@@ -97,7 +97,7 @@ def _apns_send(
 	)
 
 
-def apns_send_message(registration_id, alert, application_id=None, certfile=None, **kwargs):
+def apns_send_message(registration_id, alert, topic=None, application_id=None, certfile=None, **kwargs):
 	"""
 	Sends an APNS notification to a single registration_id.
 	This will send the notification as form data.
@@ -111,7 +111,7 @@ def apns_send_message(registration_id, alert, application_id=None, certfile=None
 
 	try:
 		_apns_send(
-			registration_id, alert, application_id=application_id,
+			registration_id, alert, application_id=application_id, topic=topic,
 			certfile=certfile, **kwargs
 		)
 	except apns2_errors.APNsException as apns2_exception:
@@ -123,7 +123,7 @@ def apns_send_message(registration_id, alert, application_id=None, certfile=None
 
 
 def apns_send_bulk_message(
-	registration_ids, alert, application_id=None, certfile=None, **kwargs
+	registration_ids, alert, topic=None, application_id=None, certfile=None, **kwargs
 ):
 	"""
 	Sends an APNS notification to one or more registration_ids.
@@ -135,7 +135,7 @@ def apns_send_bulk_message(
 	"""
 
 	results = _apns_send(
-		registration_ids, alert, batch=True, application_id=application_id,
+		registration_ids, alert, topic=topic, batch=True, application_id=application_id,
 		certfile=certfile, **kwargs
 	)
 	inactive_tokens = [token for token, result in results.items() if result == "Unregistered"]
