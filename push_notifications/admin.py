@@ -1,10 +1,13 @@
 from django.apps import apps
 from django.contrib import admin, messages
 from django.utils.translation import ugettext_lazy as _
+
 from .apns import APNSServerError
 from .gcm import GCMError
-from .models import APNSDevice, GCMDevice, WNSDevice
+from .models import APNSDevice, GCMDevice, WebPushDevice, WNSDevice
 from .settings import PUSH_NOTIFICATIONS_SETTINGS as SETTINGS
+from .webpush import WebPushError
+
 
 User = apps.get_model(*SETTINGS["USER_MODEL"].split("."))
 
@@ -40,6 +43,8 @@ class DeviceAdmin(admin.ModelAdmin):
 				errors.append(str(e))
 			except APNSServerError as e:
 				errors.append(e.status)
+			except WebPushError as e:
+				errors.append(e.message)
 
 			if bulk:
 				break
@@ -112,3 +117,4 @@ class GCMDeviceAdmin(DeviceAdmin):
 admin.site.register(APNSDevice, DeviceAdmin)
 admin.site.register(GCMDevice, GCMDeviceAdmin)
 admin.site.register(WNSDevice, DeviceAdmin)
+admin.site.register(WebPushDevice, DeviceAdmin)

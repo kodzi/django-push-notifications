@@ -7,15 +7,11 @@ https://firebase.google.com/docs/cloud-messaging/
 
 import json
 
-try:
-	from urllib.request import Request, urlopen
-except ImportError:
-	# Python 2 support
-	from urllib2 import Request, urlopen
-
 from django.core.exceptions import ImproperlyConfigured
-from . import NotificationError
+
+from .compat import Request, urlopen
 from .conf import get_manager
+from .exceptions import NotificationError
 from .models import GCMDevice
 
 
