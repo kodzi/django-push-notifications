@@ -123,7 +123,7 @@ class APNSDeviceManager(models.Manager):
 
 
 class APNSDeviceQuerySet(models.query.QuerySet):
-	def send_message(self, message, topic=None, certfile=None, **kwargs):
+	def send_message(self, message, certfile=None, topic=None, **kwargs):
 		if self:
 			from .apns import apns_send_bulk_message
 
@@ -135,8 +135,8 @@ class APNSDeviceQuerySet(models.query.QuerySet):
 					"registration_id", flat=True)
 				)
 				r = apns_send_bulk_message(
-					registration_ids=reg_ids, alert=message, topic=topic, application_id=app_id,
-					certfile=certfile, **kwargs
+					registration_ids=reg_ids, alert=message, application_id=app_id,
+					certfile=certfile, topic=topic, **kwargs
 				)
 				if hasattr(r, "keys"):
 					res += [r]
@@ -159,13 +159,13 @@ class APNSDevice(Device):
 	class Meta:
 		verbose_name = _("APNS device")
 
-	def send_message(self, message, topic=None, certfile=None, **kwargs):
+	def send_message(self, message, certfile=None, topic=None, **kwargs):
 		from .apns import apns_send_message
 
 		return apns_send_message(
 			registration_id=self.registration_id,
-			alert=message, topic=topic,
-			application_id=self.application_id, certfile=certfile,
+			alert=message, application_id=self.application_id,
+			certfile=certfile, topic=topic,
 			**kwargs
 		)
 
